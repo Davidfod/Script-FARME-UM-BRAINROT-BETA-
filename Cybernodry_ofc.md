@@ -1,171 +1,184 @@
 local UIS = game:GetService("UserInputService")
 local RepS = game:GetService("ReplicatedStorage")
+local RunS = game:GetService("RunService")
 local LP = game:GetService("Players").LocalPlayer
 local Char = LP.Character or LP.CharacterAdded:Wait()
 
-local ui = Instance.new("ScreenGui")
-ui.Name = "Cyber_v2"
-ui.Parent = LP.PlayerGui
+local ui = Instance.new("ScreenGui", LP.PlayerGui)
+ui.Name = "CyberV3_Retail"
 ui.ResetOnSpawn = false
 
 local function drag(f)
-	local d, di, ds, sp
-	f.InputBegan:Connect(function(i)
-		if i.UserInputType == Enum.UserInputType.MouseButton1 then
-			d = true ds = i.Position sp = f.Position
-		end
-	end)
-	UIS.InputChanged:Connect(function(i)
-		if d and i.UserInputType == Enum.UserInputType.MouseMovement then
-			local dt = i.Position - ds
-			f.Position = UDim2.new(sp.X.Scale, sp.X.Offset + dt.X, sp.Y.Scale, sp.Y.Offset + dt.Y)
-		end
-	end)
-	UIS.InputEnded:Connect(function(i)
-		if i.UserInputType == Enum.UserInputType.MouseButton1 then d = false end
-	end)
+    local d, di, ds, sp
+    f.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then
+            d = true ds = i.Position sp = f.Position
+        end
+    end)
+    UIS.InputChanged:Connect(function(i)
+        if d and i.UserInputType == Enum.UserInputType.MouseMovement then
+            local dt = i.Position - ds
+            f.Position = UDim2.new(sp.X.Scale, sp.X.Offset + dt.X, sp.Y.Scale, sp.Y.Offset + dt.Y)
+        end
+    end)
+    UIS.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 then d = false end
+    end)
 end
 
-local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 280, 0, 240)
-main.Position = UDim2.new(0.5, -140, 0.4, -120)
-main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+local main = Instance.new("Frame", ui)
+main.Size = UDim2.new(0, 280, 0, 280)
+main.Position = UDim2.new(0.5, -140, 0.4, -140)
+main.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 main.BorderSizePixel = 0
-main.Parent = ui
+main.ClipsDescendants = true
 drag(main)
 
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 8)
-local grad = Instance.new("UIGradient", main)
-grad.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 40)), ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 25))}
-
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 6)
 local line = Instance.new("Frame", main)
 line.Size = UDim2.new(1, 0, 0, 2)
-line.Position = UDim2.new(0, 0, 0, 40)
-line.BackgroundColor3 = Color3.fromRGB(180, 50, 255)
+line.Position = UDim2.new(0, 0, 0, 38)
+line.BackgroundColor3 = Color3.fromRGB(160, 40, 255)
 line.BorderSizePixel = 0
 
 local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, -80, 0, 40)
-title.Position = UDim2.new(0, 15, 0, 0)
-title.Text = "PAINEL CYBER"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextXAlignment = "Left"
+title.Size = UDim2.new(1, -20, 0, 38)
+title.Position = UDim2.new(0, 12, 0, 0)
+title.Text = "CYBER HUB | V3"
+title.TextColor3 = Color3.new(1,1,1)
 title.Font = "GothamBold"
-title.TextSize = 16
+title.TextSize = 14
 title.BackgroundTransparency = 1
+title.TextXAlignment = "Left"
 
 local close = Instance.new("TextButton", main)
-close.Size = UDim2.new(0, 24, 0, 24)
-close.Position = UDim2.new(1, -30, 0, 8)
-close.Text = "×"
-close.TextColor3 = Color3.new(1, 1, 1)
-close.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-close.Font = "GothamBold"
-Instance.new("UICorner", close).CornerRadius = UDim.new(1, 0)
+close.Size = UDim2.new(0, 22, 0, 22)
+close.Position = UDim2.new(1, -28, 0, 8)
+close.Text = "x"
+close.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+close.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", close).CornerRadius = UDim.new(1,0)
 close.MouseButton1Click:Connect(function() ui:Destroy() end)
 
-local min = Instance.new("TextButton", main)
-min.Size = UDim2.new(0, 12, 0, 12)
-min.Position = UDim2.new(1, -50, 0, 14)
-min.Text = ""
-min.BackgroundColor3 = Color3.fromRGB(255, 200, 50)
-Instance.new("UICorner", min).CornerRadius = UDim.new(1, 0)
+local mini = Instance.new("TextButton", main)
+mini.Size = UDim2.new(0, 12, 0, 12)
+mini.Position = UDim2.new(1, -48, 0, 13)
+mini.Text = ""
+mini.BackgroundColor3 = Color3.fromRGB(255, 200, 50)
+Instance.new("UICorner", mini).CornerRadius = UDim.new(1,0)
 
--- Menu de TPs
+local function btn(txt, p, pos, c)
+    local b = Instance.new("TextButton", p)
+    b.Size = UDim2.new(0.9, 0, 0, 35)
+    b.Position = pos
+    b.Text = txt
+    b.BackgroundColor3 = c or Color3.fromRGB(30, 30, 38)
+    b.TextColor3 = Color3.new(1,1,1)
+    b.Font = "GothamMedium"
+    b.TextSize = 12
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 4)
+    return b
+end
+
+local tpsBtn = btn("MENU TELEPORTES", main, UDim2.new(0.05, 0, 0, 50))
+local cashBtn = btn("CASH PANEL", main, UDim2.new(0.05, 0, 0, 95))
+
+local isMini = false
+mini.MouseButton1Click:Connect(function()
+    isMini = not isMini
+    if isMini then
+        tpsBtn.Visible = false
+        cashBtn.Visible = false
+        main:TweenSize(UDim2.new(0, 280, 0, 38), "Out", "Quart", 0.3, true)
+    else
+        main:TweenSize(UDim2.new(0, 280, 0, 280), "Out", "Quart", 0.3, true)
+        task.wait(0.2)
+        tpsBtn.Visible = true
+        cashBtn.Visible = true
+    end
+end)
+
 local tpF = Instance.new("Frame", ui)
-tpF.Size = UDim2.new(0, 220, 0, 320)
-tpF.Position = UDim2.new(0.5, 150, 0.4, -160)
-tpF.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+tpF.Size = UDim2.new(0, 200, 0, 300)
+tpF.Position = UDim2.new(0.5, 150, 0.4, -150)
+tpF.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 tpF.Visible = false
 Instance.new("UICorner", tpF)
 drag(tpF)
 
-local tpList = Instance.new("ScrollingFrame", tpF)
-tpList.Size = UDim2.new(1, -20, 1, -50)
-tpList.Position = UDim2.new(0, 10, 0, 45)
-tpList.BackgroundTransparency = 1
-tpList.ScrollBarThickness = 2
-
-local function createBtn(txt, parent, pos, color)
-	local b = Instance.new("TextButton", parent)
-	b.Size = UDim2.new(0.9, 0, 0, 38)
-	b.Position = pos
-	b.Text = txt
-	b.BackgroundColor3 = color or Color3.fromRGB(35, 35, 45)
-	b.TextColor3 = Color3.new(1, 1, 1)
-	b.Font = "Gotham"
-	b.TextSize = 13
-	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 5)
-	return b
-end
-
-local btnTp = createBtn("TELEPORTES", main, UDim2.new(0.05, 0, 0, 60), Color3.fromRGB(45, 40, 60))
-local btnCash = createBtn("CASH INJECTOR", main, UDim2.new(0.05, 0, 0, 110), Color3.fromRGB(45, 40, 60))
-
--- Sistema Cash
 local cF = Instance.new("Frame", ui)
-cF.Size = UDim2.new(0, 220, 0, 200)
-cF.Position = UDim2.new(0.5, -110, 0.4, -100)
-cF.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+cF.Size = UDim2.new(0, 220, 0, 240)
+cF.Position = UDim2.new(0.5, -110, 0.4, -120)
+cF.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
 cF.Visible = false
 Instance.new("UICorner", cF)
 drag(cF)
 
 local nIn = Instance.new("TextBox", cF)
 nIn.Size = UDim2.new(0.8, 0, 0, 30)
-nIn.Position = UDim2.new(0.1, 0, 0.2, 0)
+nIn.Position = UDim2.new(0.1, 0, 0.15, 0)
 nIn.Text = LP.Name
-nIn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+nIn.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 nIn.TextColor3 = Color3.new(1,1,1)
 
 local vIn = Instance.new("TextBox", cF)
 vIn.Size = UDim2.new(0.8, 0, 0, 30)
-vIn.Position = UDim2.new(0.1, 0, 0.45, 0)
+vIn.Position = UDim2.new(0.1, 0, 0.35, 0)
 vIn.PlaceholderText = "Valor..."
-vIn.Text = ""
-vIn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+vIn.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 vIn.TextColor3 = Color3.new(1,1,1)
 
-local go = createBtn("INJETAR", cF, UDim2.new(0.1, 0, 0.7, 0), Color3.fromRGB(0, 120, 70))
+local inject = btn("INJETAR AGORA", cF, UDim2.new(0.1, 0, 0.6, 0), Color3.fromRGB(0, 100, 50))
+local autoBtn = btn("AUTO CASH: OFF", cF, UDim2.new(0.1, 0, 0.8, 0), Color3.fromRGB(60, 60, 70))
 
-btnTp.MouseButton1Click:Connect(function() tpF.Visible = not tpF.Visible end)
-btnCash.MouseButton1Click:Connect(function() cF.Visible = not cF.Visible end)
-
-local isMin = false
-min.MouseButton1Click:Connect(function()
-	isMin = not isMin
-	main:TweenSize(isMin and UDim2.new(0, 200, 0, 40) or UDim2.new(0, 280, 0, 240), "Out", "Quart", 0.3, true)
-	btnTp.Visible = not isMin
-	btnCash.Visible = not isMin
+-- LOGICA SUPER FAST
+local loopConn
+autoBtn.MouseButton1Click:Connect(function()
+    if loopConn then
+        loopConn:Disconnect()
+        loopConn = nil
+        autoBtn.Text = "AUTO CASH: OFF"
+        autoBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+    else
+        autoBtn.Text = "AUTO CASH: ON"
+        autoBtn.BackgroundColor3 = Color3.fromRGB(160, 40, 255)
+        
+        local r = RepS:FindFirstChild("DebugMoney", true) or RepS:FindFirstChild("DecrementMoney", true)
+        
+        loopConn = RunS.RenderStepped:Connect(function()
+            local v = tonumber(vIn.Text)
+            if r and v then
+                pcall(function() 
+                    r:FireServer(-v, nIn.Text) 
+                    r:FireServer(-v) 
+                end)
+            end
+        end)
+    end
 end)
 
--- TPs
-local function getRemote()
-	local r = RepS:FindFirstChild("DebugMoney", true)
-	if r and r:IsA("RemoteEvent") then return r end
-	return RepS:FindFirstChild("DecrementMoney", true)
-end
-
-go.MouseButton1Click:Connect(function()
-	local r = getRemote()
-	local v = tonumber(vIn.Text)
-	if r and v then
-		pcall(function() r:FireServer(-v, nIn.Text) r:FireServer(-v) end)
-		go.Text = "OK!" task.wait(1) go.Text = "INJETAR"
-	end
+inject.MouseButton1Click:Connect(function()
+    local r = RepS:FindFirstChild("DebugMoney", true) or RepS:FindFirstChild("DecrementMoney", true)
+    local v = tonumber(vIn.Text)
+    if r and v then
+        pcall(function() r:FireServer(-v, nIn.Text) r:FireServer(-v) end)
+    end
 end)
+
+tpsBtn.MouseButton1Click:Connect(function() tpF.Visible = not tpF.Visible end)
+cashBtn.MouseButton1Click:Connect(function() cF.Visible = not cF.Visible end)
 
 for i = 1, 6 do
-	local b = createBtn("Area "..i, tpList, UDim2.new(0.05, 0, 0, (i-1)*45))
-	b.MouseButton1Click:Connect(function()
-		local a = workspace:FindFirstChild("Areas")
-		if a and a:FindFirstChild("Area"..i) then
-			local p = a["Area"..i]:FindFirstChild("Boundary") or a["Area"..i]:FindFirstChild("EventZone")
-			if p and Char:FindFirstChild("HumanoidRootPart") then
-				local cf = p.CFrame
-				if i == 2 then cf = cf * CFrame.new(0, 3, (p.Size.Z/2)+3) else cf = cf * CFrame.new(0, 3, 0) end
-				Char.HumanoidRootPart.CFrame = cf
-			end
-		end
-	end)
+    local b = btn("Area "..i, tpF, UDim2.new(0.05, 0, 0, (i-1)*45 + 40))
+    b.MouseButton1Click:Connect(function()
+        local a = workspace:FindFirstChild("Areas")
+        if a and a:FindFirstChild("Area"..i) then
+            local p = a["Area"..i]:FindFirstChild("Boundary") or a["Area"..i]:FindFirstChild("EventZone")
+            if p and Char:FindFirstChild("HumanoidRootPart") then
+                local cf = p.CFrame
+                if i == 2 then cf = cf * CFrame.new(0, 3, (p.Size.Z/2)+3) else cf = cf * CFrame.new(0, 3, 0) end
+                Char.HumanoidRootPart.CFrame = cf
+            end
+        end
+    end)
 end
