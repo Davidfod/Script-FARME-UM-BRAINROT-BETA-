@@ -5,8 +5,12 @@ local LP = game:GetService("Players").LocalPlayer
 local Char = LP.Character or LP.CharacterAdded:Wait()
 
 local ui = Instance.new("ScreenGui", LP.PlayerGui)
-ui.Name = "CyberV3_Retail"
+ui.Name = "CyberV3_Retail_Fling"
 ui.ResetOnSpawn = false
+
+-- Variaveis de controle do Fling
+local flingAtivo = false
+local ultimaPosicaoSegura = nil
 
 local function drag(f)
     local d, di, ds, sp
@@ -44,7 +48,7 @@ line.BorderSizePixel = 0
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, -20, 0, 38)
 title.Position = UDim2.new(0, 12, 0, 0)
-title.Text = "CYBER HUB | V3"
+title.Text = "CYBER HUB"
 title.TextColor3 = Color3.new(1,1,1)
 title.Font = "GothamBold"
 title.TextSize = 14
@@ -80,8 +84,10 @@ local function btn(txt, p, pos, c)
     return b
 end
 
-local tpsBtn = btn("MENU TELEPORTES", main, UDim2.new(0.05, 0, 0, 50))
-local cashBtn = btn("CASH PANEL", main, UDim2.new(0.05, 0, 0, 95))
+-- Botões do Menu Principal
+local tpsBtn = btn("TELEPORTE AREA", main, UDim2.new(0.05, 0, 0, 50))
+local cashBtn = btn("SETAR DINHEIRO", main, UDim2.new(0.05, 0, 0, 95))
+local flingBtn = btn("FLING", main, UDim2.new(0.05, 0, 0, 140)) -- Novo Botão
 
 local isMini = false
 mini.MouseButton1Click:Connect(function()
@@ -89,15 +95,18 @@ mini.MouseButton1Click:Connect(function()
     if isMini then
         tpsBtn.Visible = false
         cashBtn.Visible = false
+        flingBtn.Visible = false
         main:TweenSize(UDim2.new(0, 280, 0, 38), "Out", "Quart", 0.3, true)
     else
         main:TweenSize(UDim2.new(0, 280, 0, 280), "Out", "Quart", 0.3, true)
         task.wait(0.2)
         tpsBtn.Visible = true
         cashBtn.Visible = true
+        flingBtn.Visible = true
     end
 end)
 
+-- PAINEL DE TELEPORTE
 local tpF = Instance.new("Frame", ui)
 tpF.Size = UDim2.new(0, 200, 0, 300)
 tpF.Position = UDim2.new(0.5, 150, 0.4, -150)
@@ -106,6 +115,7 @@ tpF.Visible = false
 Instance.new("UICorner", tpF)
 drag(tpF)
 
+-- PAINEL DE CASH
 local cF = Instance.new("Frame", ui)
 cF.Size = UDim2.new(0, 220, 0, 240)
 cF.Position = UDim2.new(0.5, -110, 0.4, -120)
@@ -114,6 +124,18 @@ cF.Visible = false
 Instance.new("UICorner", cF)
 drag(cF)
 
+-- PAINEL DE FLING (NOVO)
+local fF = Instance.new("Frame", ui)
+fF.Size = UDim2.new(0, 200, 0, 100)
+fF.Position = UDim2.new(0.5, -350, 0.4, -50)
+fF.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+fF.Visible = false
+Instance.new("UICorner", fF)
+drag(fF)
+
+local flingToggleBtn = btn("FLING SYSTEM: OFF", fF, UDim2.new(0.05, 0, 0.3, 0), Color3.fromRGB(40, 40, 45))
+
+-- LÓGICA DO CASH
 local nIn = Instance.new("TextBox", cF)
 nIn.Size = UDim2.new(0.8, 0, 0, 30)
 nIn.Position = UDim2.new(0.1, 0, 0.15, 0)
@@ -131,7 +153,6 @@ vIn.TextColor3 = Color3.new(1,1,1)
 local inject = btn("INJETAR AGORA", cF, UDim2.new(0.1, 0, 0.6, 0), Color3.fromRGB(0, 100, 50))
 local autoBtn = btn("AUTO CASH: OFF", cF, UDim2.new(0.1, 0, 0.8, 0), Color3.fromRGB(60, 60, 70))
 
--- LOGICA SUPER FAST
 local loopConn
 autoBtn.MouseButton1Click:Connect(function()
     if loopConn then
@@ -142,9 +163,7 @@ autoBtn.MouseButton1Click:Connect(function()
     else
         autoBtn.Text = "AUTO CASH: ON"
         autoBtn.BackgroundColor3 = Color3.fromRGB(160, 40, 255)
-        
         local r = RepS:FindFirstChild("DebugMoney", true) or RepS:FindFirstChild("DecrementMoney", true)
-        
         loopConn = RunS.RenderStepped:Connect(function()
             local v = tonumber(vIn.Text)
             if r and v then
@@ -165,8 +184,75 @@ inject.MouseButton1Click:Connect(function()
     end
 end)
 
+-- LÓGICA DO FLING INTEGRADA (ANTI-FLING + PHANTOM)
+RunS.Stepped:Connect(function()
+    if flingAtivo then
+        local char = LP.Character
+        if char then
+            for _, part in ipairs(char:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanTouch = false 
+                    part.Velocity = Vector3.new(0, 0, 0)
+                    part.RotVelocity = Vector3.new(0, 0, 0)
+                end
+            end
+        end
+    end
+end)
+
+RunS.Heartbeat:Connect(function()
+    if flingAtivo then
+        local char = LP.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        local hum = char and char:FindFirstChild("Humanoid")
+        
+        if hrp and hum then
+            if hrp.Velocity.Magnitude < 40 then
+                ultimaPosicaoSegura = hrp.CFrame
+            end
+            if hrp.Velocity.Magnitude > 60 then
+                hrp.Velocity = Vector3.new(0, 0, 0)
+                hrp.CFrame = ultimaPosicaoSegura
+            end
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+            hrp.Velocity = Vector3.new(0, 0.05, 0)
+            hrp.RotVelocity = Vector3.new(0, 50000, 0)
+        end
+    end
+end)
+
+flingToggleBtn.MouseButton1Click:Connect(function()
+    flingAtivo = not flingAtivo
+    local char = LP.Character
+    local hum = char and char:FindFirstChild("Humanoid")
+
+    if flingAtivo then
+        flingToggleBtn.Text = "FLING SYSTEM: ON"
+        flingToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 70)
+        if hum then hum.WalkSpeed = 12 end
+    else
+        flingToggleBtn.Text = "FLING SYSTEM: OFF"
+        flingToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+        if char then
+            for _, part in ipairs(char:GetChildren()) do
+                if part:IsA("BasePart") then 
+                    part.CanTouch = true 
+                    part.CanCollide = true
+                end
+            end
+            if hum then hum.WalkSpeed = 16 end
+        end
+    end
+end)
+
+-- BOTÕES DE ABRIR PAINÉIS
 tpsBtn.MouseButton1Click:Connect(function() tpF.Visible = not tpF.Visible end)
 cashBtn.MouseButton1Click:Connect(function() cF.Visible = not cF.Visible end)
+flingBtn.MouseButton1Click:Connect(function() fF.Visible = not fF.Visible end)
 
 for i = 1, 6 do
     local b = btn("Area "..i, tpF, UDim2.new(0.05, 0, 0, (i-1)*45 + 40))
@@ -174,10 +260,10 @@ for i = 1, 6 do
         local a = workspace:FindFirstChild("Areas")
         if a and a:FindFirstChild("Area"..i) then
             local p = a["Area"..i]:FindFirstChild("Boundary") or a["Area"..i]:FindFirstChild("EventZone")
-            if p and Char:FindFirstChild("HumanoidRootPart") then
+            if p and (LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")) then
                 local cf = p.CFrame
                 if i == 2 then cf = cf * CFrame.new(0, 3, (p.Size.Z/2)+3) else cf = cf * CFrame.new(0, 3, 0) end
-                Char.HumanoidRootPart.CFrame = cf
+                LP.Character.HumanoidRootPart.CFrame = cf
             end
         end
     end)
